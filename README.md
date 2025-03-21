@@ -1,6 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alpine Control Room
+
+Alpine Control Room is a web application designed to view and monitor various ski resort webcams in the Alps. For now, it supports only a few ski resort, in the future, more will be supported.
+
+![Alpine Control Room](public/concept-3.webp)
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 First, run the development server:
 
