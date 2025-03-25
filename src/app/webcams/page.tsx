@@ -29,6 +29,8 @@ function openNewTabWithSelectedWebcam(url: string | undefined): void {
 
 export default function Page() {
   const allWebcams = webcams.map((webcam) => {
+    const isUnoptimized = webcam.thumbnailLink?.includes("wtvpict.feratel.com"); // Example condition
+
     return (
       <div
         className="border border-gray-400 rounded-xl overflow-hidden"
@@ -39,6 +41,7 @@ export default function Page() {
           alt={webcam.label}
           width={373}
           height={210}
+          {...(isUnoptimized ? { unoptimized: true } : {})} // Conditionally apply unoptimized
         />
         <div className="p-2">
           <div className="flex justify-between items-center">
