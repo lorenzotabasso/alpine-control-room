@@ -2,6 +2,8 @@
 
 import { webcams } from "@/lib/data";
 import { ContentType, WebcamProps } from "@/lib/definitions";
+import { Button, Description, Field, Input, Label } from "@headlessui/react";
+import clsx from "clsx";
 import Image from "next/image";
 
 function checkWebcamSource(source: WebcamProps): string {
@@ -21,9 +23,16 @@ function composeWebcamRegion(webcam: WebcamProps): string {
   return `${nationFlag} ${webcam.region}${subRegion}`;
 }
 
-function openNewTabWithSelectedWebcam(url: string | undefined): void {
+function openNewTabWithSelectedWebcam(
+  url: string | undefined,
+  isModal?: boolean
+): void {
   if (url) {
     window.open(url);
+  }
+  if (isModal) {
+    // Close the modal if applicable
+    // This is a placeholder, implement your modal close logic here
   }
 }
 
@@ -36,7 +45,7 @@ export default function Page() {
       >
         <div>
           <Image
-            style={{ height: '224px', objectFit: "cover" }}
+            style={{ height: "224px", objectFit: "cover" }}
             src={checkWebcamSource(webcam)}
             alt={webcam.label}
             width={398}
@@ -79,20 +88,20 @@ export default function Page() {
         </div>
         <div className="p-2 flex justify-evenly gap-2">
           {webcam.source && (
-            <button
-              className="bg-emerald-500 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-full shadow-sm"
+            <Button
+              className="rounded-full shadow-sm bg-emerald-600 data-[hover]:bg-emerald-500 data-[active]:bg-emerald-700 py-2 px-4 text-sm text-white"
               onClick={() => openNewTabWithSelectedWebcam(webcam.source)}
             >
               Source
-            </button>
+            </Button>
           )}
           {webcam.link && (
-            <button
-              className="bg-sky-500 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-full shadow-sm"
-              onClick={() => openNewTabWithSelectedWebcam(webcam.link)}
+            <Button
+              className="rounded-full shadow-sm bg-sky-600 data-[hover]:bg-sky-500 data-[active]:bg-sky-700 py-2 px-4 text-sm text-white"
+              onClick={() => openNewTabWithSelectedWebcam(webcam.link, true)}
             >
               Open
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -101,6 +110,14 @@ export default function Page() {
 
   return (
     <div>
+      <div className="w-full max-w-md px-4 flex justify-center items-center">
+        <Input
+          className={clsx(
+            "mt-3 block w-full rounded-lg border-none bg-black/5 py-1.5 px-3 text-sm/6",
+            "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
+          )}
+        />
+      </div>
       <div className="m-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center items-center">
         {allWebcams}
       </div>
