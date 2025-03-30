@@ -29,23 +29,35 @@ function openNewTabWithSelectedWebcam(url: string | undefined): void {
 
 export default function Page() {
   const allWebcams = webcams.map((webcam) => {
-    const isUnoptimized = webcam.thumbnailLink?.includes("wtvpict.feratel.com"); // Example condition
-
     return (
       <div
         className="border border-gray-400 rounded-xl overflow-hidden"
         key={webcam.resort + "-" + webcam.label}
       >
-        <Image
-          src={checkWebcamSource(webcam)}
-          alt={webcam.label}
-          width={373}
-          height={210}
-          {...(isUnoptimized ? { unoptimized: true } : {})} // Conditionally apply unoptimized
-        />
+        <div>
+          <Image
+            style={{ height: '224px', objectFit: "cover" }}
+            src={checkWebcamSource(webcam)}
+            alt={webcam.label}
+            width={398}
+            height={224}
+            unoptimized={webcam.thumbnailUnoptimized}
+          />
+        </div>
         <div className="p-2">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold">{webcam.resort}</h3>
+            {webcam.contentType === ContentType.IMG && (
+              <div className="flex justify-between items-center text-blue-600">
+                <h5 className="text-sm font-normal mr-1">Static</h5>
+                <Image
+                  src="./photoCamera.svg"
+                  alt="This webcam updates after few minutes"
+                  width={24}
+                  height={24}
+                />
+              </div>
+            )}
             {webcam.contentType === ContentType.IFRAME && (
               <div className="flex justify-between items-center text-red-600">
                 <h5 className="text-sm font-normal mr-1">Live</h5>

@@ -46,6 +46,7 @@ export const webcams: WebcamProps[] = [
     contentType: ContentType.IFRAME,
     link: "https://webtv.feratel.com/webtv/?design=v3&cam=6316",
     thumbnailLink: 'https://wtvpict.feratel.com/picture/38/6316.jpeg?&design=v3',
+    thumbnailUnoptimized: true,
   },
   {
     nation: 'ITA',
@@ -60,3 +61,7 @@ export const webcams: WebcamProps[] = [
     link: 'https://pratonevoso.panomax.com/',
   },
 ];
+
+export const unoptimzedDomains: string[] = [
+  "wtvpict.feratel.com",
+]

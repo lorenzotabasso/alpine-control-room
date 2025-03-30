@@ -16,6 +16,7 @@ export interface WebcamProps {
   source?: string;
   link: string;
   thumbnailLink?: string;
+  thumbnailUnoptimized?: boolean;
 }
 
 export interface Coordinates {
