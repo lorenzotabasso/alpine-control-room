@@ -1,13 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { webcams } from "@/lib/data";
 import { ContentType, WebcamProps } from "@/lib/definitions";
-import { Button, Description, Field, Input, Label } from "@headlessui/react";
+import {
+  Button,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Input
+} from "@headlessui/react";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 
 function checkWebcamSource(source: WebcamProps): string {
-  if (source.contentType === ContentType.IMG) {
+  if (source.contentType === "img") {
     return source.link;
   } else {
     return source.thumbnailLink
@@ -23,20 +31,42 @@ function composeWebcamRegion(webcam: WebcamProps): string {
   return `${nationFlag} ${webcam.region}${subRegion}`;
 }
 
-function openNewTabWithSelectedWebcam(
-  url: string | undefined,
-  isModal?: boolean
-): void {
-  if (url) {
-    window.open(url);
-  }
-  if (isModal) {
-    // Close the modal if applicable
-    // This is a placeholder, implement your modal close logic here
-  }
-}
-
 export default function Page() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Detect if the device is desktop
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024); // Desktop if width >= 1024px
+    };
+
+    handleResize(); // Check on initial render
+    window.addEventListener("resize", handleResize); // Listen for window resize
+
+    return () => {
+      window.removeEventListener("resize", handleResize); // Cleanup on unmount
+    };
+  }, []);
+
+  const openDialog = (src: string, alt: string) => {
+    if (isDesktop) {
+      setSelectedImage({ src, alt });
+      setIsOpen(true);
+    } else {
+      console.log("Modal is disabled on mobile devices.");
+    }
+  };
+
+  const closeDialog = () => {
+    setSelectedImage(null);
+    setIsOpen(false);
+  };
+
   const allWebcams = webcams.map((webcam) => {
     return (
       <div
@@ -51,6 +81,9 @@ export default function Page() {
             width={398}
             height={224}
             unoptimized={webcam.thumbnailUnoptimized}
+            onClick={() =>
+              openDialog(checkWebcamSource(webcam), webcam.label)
+            } // Open dialog with selected image
           />
         </div>
         <div className="p-2">
@@ -89,16 +122,16 @@ export default function Page() {
         <div className="p-2 flex justify-evenly gap-2">
           {webcam.source && (
             <Button
-              className="rounded-full shadow-sm bg-emerald-600 data-[hover]:bg-emerald-500 data-[active]:bg-emerald-700 py-2 px-4 text-sm text-white"
-              onClick={() => openNewTabWithSelectedWebcam(webcam.source)}
+              className="rounded shadow-md bg-emerald-500 data-[hover]:bg-emerald-600 data-[active]:bg-emerald-700 py-2 px-4 text-sm text-white transition duration-200"
+              onClick={() => window.open(webcam.source)}
             >
               Source
             </Button>
           )}
           {webcam.link && (
             <Button
-              className="rounded-full shadow-sm bg-sky-600 data-[hover]:bg-sky-500 data-[active]:bg-sky-700 py-2 px-4 text-sm text-white"
-              onClick={() => openNewTabWithSelectedWebcam(webcam.link, true)}
+              className="rounded shadow-md bg-sky-500 data-[hover]:bg-sky-600 data-[active]:bg-sky-700 py-2 px-4 text-sm text-white transition duration-200"
+              onClick={() => window.open(webcam.link)}
             >
               Open
             </Button>
@@ -121,6 +154,55 @@ export default function Page() {
       <div className="m-4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center items-center">
         {allWebcams}
       </div>
+      <AnimatePresence>
+        {isOpen && selectedImage && (
+          <Dialog
+            static
+            open={isOpen}
+            onClose={closeDialog}
+            className="relative z-50"
+          >
+            {/* Background overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/30"
+            />
+            {/* Modal container */}
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <DialogPanel
+                as={motion.div}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-[90vw] h-[90vh] max-w-6xl max-h-[90vh] space-y-4 rounded-xl bg-white p-6 overflow-auto" // Added overflow-auto
+              >
+                <DialogTitle className="text-lg font-bold">
+                  Selected Image
+                </DialogTitle>
+                <div className="flex justify-center items-center">
+                  <Image
+                    src={selectedImage.src}
+                    alt={selectedImage.alt}
+                    width={1200}
+                    height={800}
+                    unoptimized
+                  />
+                </div>
+                <div className="flex justify-end gap-4">
+                  <button
+                    className="rounded bg-gray-200 px-4 py-2"
+                    onClick={closeDialog}
+                  >
+                    Close
+                  </button>
+                </div>
+              </DialogPanel>
+            </div>
+          </Dialog>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
